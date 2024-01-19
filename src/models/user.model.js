@@ -49,7 +49,7 @@ const userSchama=new Schema({
 userSchama.pre("save",async function(next){
     //if any fild change then run this function 
     if(!this.modified("password"))return next();
-    this.password=bcryt.hash(this.password,10);
+    this.password= await bcryt.hash(this.password,10);
     next();
 })
 userSchama.methods.isPasswordCorrect=async function(password){
