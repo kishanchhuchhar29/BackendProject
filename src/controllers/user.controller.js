@@ -13,6 +13,7 @@ const registeruser= asyncHandler(async (req,res)=>{
     //remove password and reffresh token
     //check for user create
     //return respond
+
     const {fullName,email,username,password}=req.body
     console.log("email : ",email);
     if(
@@ -20,17 +21,26 @@ const registeruser= asyncHandler(async (req,res)=>{
     ){
         throw new ApiError(400,"all fild are required")
     }
-     const exgistuser=User.findOne(
-        $or=[{ username },{ email }]
-     )
+     const exgistuser=await User.findOne({
+        $or:[{ username },{ email }]
+})
      if(exgistuser){
         throw new ApiError(409,"User allready Exists")
+     } 
+     console.log(email);
+     const avatarImagelocalpath= req.files?.avatar?.[0]?.path;
+    // const coverImagelocalpath= req.files?.coverImage[0]?.path;
+     console.log("cbjb",avatarImagelocalpath);
+     let coverImageLocalPath;
+     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+         coverImageLocalPath = req.files?.coverImage?.[0]?.path;
      }
-     const avatarImagelocalpath=req.filds?.avatar[0]?.path;
-     const coverImagelocalpath= req.filds?.coverImage[0]?.path;
      if(!avatarImagelocalpath)throw new ApiError(400,"Avatar file is required")
-     const avatar=await uploadoncloudinary(avatarImagelocalpath)
-     const coverImage=await uploadoncloudinary(coverImagelocalpath);
+     const avatar=await uploadoncloudinary(avatarImagelocalpath);
+
+    
+     const coverImage=await uploadoncloudinary(coverImageLocalPath);
+     
      if(!avatar) throw new ApiError(400,"Avatar file is required")
      const user= await User.create({
          fullName,
@@ -40,11 +50,11 @@ const registeruser= asyncHandler(async (req,res)=>{
          password,
          username:username.toLowerCase()
     })
-    const createuser=User.findById(user._id).select(
+    const createuser=await User.findById(user._id).select(
         "-password -refreshToken"
     )
     if(!createuser){
-        throw ApiError(500,"somthing want wonge while register user")
+        throw new ApiError(500,"somthing want wonge while register user")
     }
     
   return res.status(201).json(

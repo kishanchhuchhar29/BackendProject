@@ -48,7 +48,7 @@ const userSchama=new Schema({
 },{timestamps:true})
 userSchama.pre("save",async function(next){
     //if any fild change then run this function 
-    if(!this.modified("password"))return next();
+    if(!this.isModified("password"))return next();
     this.password= await bcryt.hash(this.password,10);
     next();
 })

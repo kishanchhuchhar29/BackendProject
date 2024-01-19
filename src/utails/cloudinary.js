@@ -13,6 +13,7 @@ const uploadoncloudinary= async(localpath)=>{
         resource_type:"auto"
      })
      //file upload succecfully
+     fs.unlinkSync(localpath)
      console.log("file upload succecfully",respond.url);
      return respond;   
     } catch (error) {
