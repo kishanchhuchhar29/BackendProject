@@ -69,7 +69,7 @@ userSchama.methods.generateAccessToken=function(){
     )
 
 }
-userSchama.methods.generateAccessToken=function(){
+userSchama.methods.generateRefreshToken=function(){
     return jwt.sign(
         {
             _id: this._id,
