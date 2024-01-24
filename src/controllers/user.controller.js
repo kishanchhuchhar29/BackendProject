@@ -3,11 +3,13 @@ import {ApiError} from "../utails/apiError.js"
 import {User} from "../models/user.model.js"
 import {uploadoncloudinary} from "../utails/cloudinary.js"
 import {ApiResponse} from "../utails/apiRespond.js"
-const generateAccessandrefreshToken=async(userid)=>{
+const generateAccessandrefreshToken=async(userId)=>{
     try {
-        const user=await User.findOne(userid);
+       
+        const user=await User.findOne(userId);
         const accessToken=user.generateAccessToken()
         const RefreshToken=user.generateRefreshToken()
+        console.log("kishan", accessToken , " ", RefreshToken)
         user.refreshToken=RefreshToken
         await user.save({validateBeforeSave:false})
         return {accessToken,RefreshToken};
@@ -76,7 +78,7 @@ const registeruser= asyncHandler(async (req,res)=>{
 })
 const loginuser=asyncHandler(async (req,res)=>{
   const {username,email,password}=req.body
-  if(!username || !email){
+  if(!username & !email){
     throw new ApiError(400,"email or user name required")
   }
   const user=await User.findOne({
@@ -88,6 +90,7 @@ const loginuser=asyncHandler(async (req,res)=>{
   }
   const isPasswordValid= await user.isPasswordCorrect(password);
   if(!isPasswordValid){
+    console.log("hsajh")
     throw new ApiError(404,"password is inValid")
   }
   const {accessToken,RefreshToken}= await generateAccessandrefreshToken(user._id);
@@ -127,6 +130,7 @@ const logoutuser=asyncHandler(async (req,res)=>{
           .json(new ApiResponse(200,{},"user logout"))
 
 })
+
 export {registeruser,
    loginuser,
 logoutuser};

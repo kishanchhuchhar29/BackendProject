@@ -58,11 +58,11 @@ userSchama.methods.isPasswordCorrect=async function(password){
 userSchama.methods.generateAccessToken=function(){
     return jwt.sign({
         _id:this._id,
-        username:this.username,
         email:this.email,
+        username:this.username,
         fullName:this.fullName
     },
-    process.env.env.ACCESS_TOKEN_SECRET,{
+    process.env.ACCESS_TOKEN_SECRET,{
         expiresIn:process.env.ACCESS_TOKEN_EXPIRY
     }
 

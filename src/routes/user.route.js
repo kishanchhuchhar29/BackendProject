@@ -3,7 +3,6 @@ import { loginuser, logoutuser, registeruser } from "../controllers/user.control
 import { upload } from "../middlewares/multer.middelware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router=Router();
-console.log("user route")
 router.route("/register").post(upload.fields([{
     name:"avatar",
     maxCount:1
