@@ -10,7 +10,7 @@ const generateAccessandrefreshToken=async(userId)=>{
         const user=await User.findOne(userId);
         const accessToken=user.generateAccessToken()
         const RefreshToken=user.generateRefreshToken()
-        console.log("kishan", accessToken , " ", RefreshToken)
+       // console.log("kishan", accessToken , " ", RefreshToken)
         user.refreshToken=RefreshToken
         await user.save({validateBeforeSave:false})
         return {accessToken,RefreshToken};
@@ -101,8 +101,8 @@ const loginuser=asyncHandler(async (req,res)=>{
     secure:true
   }
   return res.status(200)
-  .cookie("access Token",accessToken,options)
-  .cookie("Refresh Token",RefreshToken,options)
+  .cookie("accessToken",accessToken,options)
+  .cookie("RefreshToken",RefreshToken,options)
   .json(
     new ApiResponse(
         200,{
@@ -115,8 +115,8 @@ const loginuser=asyncHandler(async (req,res)=>{
 const logoutuser=asyncHandler(async (req,res)=>{
   console.log("djs")
     await User.findByIdAndUpdate(req.user._id,{
-        $set:{
-            refreshToken:undefined
+        $unset:{
+            refreshToken:1
         }
     },
         {
@@ -164,7 +164,58 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
  }
 
 })
+const ChangeCurrenctPassword = asyncHandler(async(req,res)=>{
+ const {password,newPassword} =req.body;
+ console.log(req.user);
+   const user= await User.findById(req.user?._id);
+   //console.log(user)
+  const IspassawordCorrect=await user.isPasswordCorrect(password);
+  if(!IspassawordCorrect) throw new ApiError(401,"Password is Not Correct");
+     user.password=newPassword
+     // any Updation First save in database
+     await user.save({validateBeforeSave:false});
+
+      return res.status(200)
+      .json(
+        new ApiResponse(
+          200,
+          {},
+          "Password Update successfully"
+        )
+      )
+})
+const getcurrentuser=asyncHandler(async(req,res)=>{
+  return res.status(200)
+  .json(
+    new ApiResponse(
+      200,
+      req.user,
+      "user Detail fatched "
+    )
+  )
+})
+const UpdateAccountDtail=asyncHandler(async(req,res)=>{
+  const {fullName,email}=req.body;
+  if (!fullName || !email) {
+    throw new ApiError(400, "All fields are required")
+  }
+
+  const user= await User.findByIdAndUpdate(req.user?._id,{
+    $set :{
+       fullName,
+       email:email
+    }
+  },{new:true}).select("-password");
+  
+  return res.status(200)
+  .json(new ApiResponse(200,user,"full name and email changed"))
+
+})
+
 export {registeruser,
    loginuser,
 logoutuser,
-refreshAccessToken};
+refreshAccessToken,
+ChangeCurrenctPassword,
+UpdateAccountDtail,
+getcurrentuser};
