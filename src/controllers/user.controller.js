@@ -43,10 +43,10 @@ const registeruser= asyncHandler(async (req,res)=>{
      if(exgistuser){
         throw new ApiError(409,"User allready Exists")
      } 
-     console.log(email);
+    // console.log(email);
      const avatarImagelocalpath= req.files?.avatar?.[0]?.path;
     // const coverImagelocalpath= req.files?.coverImage[0]?.path;
-     console.log("cbjb",avatarImagelocalpath);
+     //console.log("cbjb",avatarImagelocalpath);
      let coverImageLocalPath;
      if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
          coverImageLocalPath = req.files?.coverImage?.[0]?.path;
@@ -91,12 +91,13 @@ const loginuser=asyncHandler(async (req,res)=>{
   }
   const isPasswordValid= await user.isPasswordCorrect(password);
   if(!isPasswordValid){
-    console.log("hsajh")
+   // console.log("hsajh")
     throw new ApiError(404,"password is inValid")
   }
   const {accessToken,RefreshToken}= await generateAccessandrefreshToken(user._id);
   const loginuser=await User.findById(user._id).select("-password -refreshToken");
   const options ={
+    //security perpose
     httpOnly:true,
     secure:true
   }
@@ -113,7 +114,7 @@ const loginuser=asyncHandler(async (req,res)=>{
   )
 })
 const logoutuser=asyncHandler(async (req,res)=>{
-  console.log("djs")
+  //console.log("djs")
     await User.findByIdAndUpdate(req.user._id,{
         $unset:{
             refreshToken:1

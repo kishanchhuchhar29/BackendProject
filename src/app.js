@@ -1,5 +1,7 @@
 import express, { json } from "express";
 import cors from "cors";
+//cors is use for only if i can request for Post method but defien Get method 
+// then give error
 import cookieparser from 'cookie-parser';
 const app=express()
 app.use(cors({
@@ -17,5 +19,4 @@ app.use(cookieparser());
 
 import userRouter from './routes/user.route.js';
 app.use('/api/v1/users',userRouter);
-console.log("object")
 export {app};
