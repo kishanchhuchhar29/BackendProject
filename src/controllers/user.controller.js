@@ -134,8 +134,9 @@ const logoutuser=asyncHandler(async (req,res)=>{
 })
 const refreshAccessToken=asyncHandler(async(req,res)=>{
  try {
+  //then Front-End Devlopper hit the end point and refresh Access-Token
    const incoimgrefreshToken=req.cookies.refreshToken ||req.body.refreshToken
-   if(incoimgrefreshToken)throw new ApiError(401,"unauthaisrequest");
+   if(!incoimgrefreshToken)throw new ApiError(401,"unauthaisrequest");
    const decodeToken=jwt.verify(incoimgrefreshToken,process.env.REFRESH_TOKEN_SECRET)
    const user= await User.findById(decodeToken?._id);
    if(!user)throw new ApiError(401,"invalid Refresh Token");

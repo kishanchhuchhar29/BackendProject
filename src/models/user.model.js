@@ -56,6 +56,10 @@ userSchama.methods.isPasswordCorrect=async function(password){
     return await bcryt.compare(password,this.password);
 }
 userSchama.methods.generateAccessToken=function(){
+    // what is defferens between Access Token and Refresh-Token
+    // Acess Token is sort time Live (after 15 min or 20min Token is expire);
+    //Refresh-Token is Long time Live it is presant in Server if Acess Token is expire
+    //then Front-End Devlopper hit the end point and refresh Access-Token 
     return jwt.sign({
         _id:this._id,
         email:this.email,
