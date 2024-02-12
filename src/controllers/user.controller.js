@@ -3,6 +3,7 @@ import {ApiError} from "../utails/apiError.js"
 import {User} from "../models/user.model.js"
 import {uploadoncloudinary} from "../utails/cloudinary.js"
 import {ApiResponse} from "../utails/apiRespond.js"
+import  * as jwt from "jsonwebtoken"
 const generateAccessandrefreshToken=async(userId)=>{
     try {
        
@@ -112,6 +113,7 @@ const loginuser=asyncHandler(async (req,res)=>{
   )
 })
 const logoutuser=asyncHandler(async (req,res)=>{
+  console.log("djs")
     await User.findByIdAndUpdate(req.user._id,{
         $set:{
             refreshToken:undefined
@@ -130,7 +132,38 @@ const logoutuser=asyncHandler(async (req,res)=>{
           .json(new ApiResponse(200,{},"user logout"))
 
 })
+const refreshAccessToken=asyncHandler(async(req,res)=>{
+ try {
+   const incoimgrefreshToken=req.cookies.refreshToken ||req.body.refreshToken
+   if(incoimgrefreshToken)throw new ApiError(401,"unauthaisrequest");
+   const decodeToken=jwt.verify(incoimgrefreshToken,process.env.REFRESH_TOKEN_SECRET)
+   const user= await User.findById(decodeToken?._id);
+   if(!user)throw new ApiError(401,"invalid Refresh Token");
+   if(incoimgrefreshToken!==user.refreshToken)throw new ApiError(401,"refresh Token is expire or used")
+ 
+   const option={
+     httpOnly:true,
+     secure:true
+   }
+   const {accessToken,newrefreshToken}=await generateAccessandrefreshToken(user._id);
+ 
+   return res.status(200)
+   .cookie("accessToken",accessToken,option)
+   .cookie("refreshToken",newrefreshToken,option)
+   .json(
+     new ApiResponse(
+       200,
+       {accessToken,refreshToken:newrefreshToken},
+       "Access Token refresh"
+ 
+     )
+   )
+ } catch (error) {
+     throw new ApiError(401,error?.message||"invalid Refresh Token");
+ }
 
+})
 export {registeruser,
    loginuser,
-logoutuser};
+logoutuser,
+refreshAccessToken};
